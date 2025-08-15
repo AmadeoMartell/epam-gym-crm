@@ -1,11 +1,9 @@
 package com.epam.crm.config;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
+import org.springframework.context.annotation.*;
 
 @Configuration
+@Import(StorageConfig.class)
 @ComponentScan("com.epam.crm")
 @PropertySources(@PropertySource("classpath:/application.properties"))
 public class ApplicationConfig {
