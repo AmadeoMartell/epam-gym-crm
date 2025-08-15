@@ -12,7 +12,8 @@ public class Training {
     private Long id;
     private Long traineeId;
     private Long trainerId;
-    private Long trainingType;
-    private LocalDate trainingDate;
-    private Duration trainingDuration;
+    private String name;
+    private Long trainingTypeId;
+    private LocalDate date;
+    private Duration duration;
 }

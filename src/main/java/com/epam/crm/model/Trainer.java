@@ -8,5 +8,5 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder(toBuilder = true)
 public class Trainer extends User {
-    private Long specialization;
+    private Long specializationId;
 }
