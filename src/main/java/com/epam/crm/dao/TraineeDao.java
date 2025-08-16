@@ -50,7 +50,9 @@ public class TraineeDao {
 
     public boolean delete(Long id) {
         Trainee r = storage.remove(id);
-        users.remove(r.getUsername());
+        if (r != null) {
+            users.remove(r.getUsername());
+        }
         log.info("Trainee deleted: {}", id);
         return r != null;
     }
