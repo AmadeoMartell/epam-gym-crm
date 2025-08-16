@@ -15,7 +15,8 @@
 
         <spring.version>6.2.9</spring.version>
         <lombok.version>1.18.38</lombok.version>
-
+        <slf4j.version>2.0.13</slf4j.version>
+        <logback.version>1.5.18</logback.version>
         <junit.jupiter.version>5.10.2</junit.jupiter.version>
         <mockito.version>5.12.0</mockito.version>
         <assertj.version>3.26.3</assertj.version>
@@ -37,13 +38,13 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.13</version>
+            <version>${slf4j.version}</version>
         </dependency>
 
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.5.18</version>
+            <version>${logback.version}</version>
         </dependency>
 
         <dependency>
@@ -79,5 +80,11 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
