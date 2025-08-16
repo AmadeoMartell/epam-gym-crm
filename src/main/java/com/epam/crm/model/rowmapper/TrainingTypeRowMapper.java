@@ -1,7 +1,9 @@
 package com.epam.crm.model.rowmapper;
 
 import com.epam.crm.model.TrainingType;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TrainingTypeRowMapper implements RowMapper<TrainingType> {
     @Override
     public TrainingType mapRow(String... row) throws RuntimeException {

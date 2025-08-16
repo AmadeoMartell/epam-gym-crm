@@ -1,9 +1,11 @@
 package com.epam.crm.model.rowmapper;
 
 import com.epam.crm.model.Trainee;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
+@Component
 public class TraineeRowMapper implements RowMapper<Trainee> {
     @Override
     public Trainee mapRow(String... row) throws RuntimeException {

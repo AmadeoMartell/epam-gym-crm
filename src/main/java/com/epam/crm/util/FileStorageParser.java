@@ -3,6 +3,7 @@ package com.epam.crm.util;
 import com.epam.crm.model.rowmapper.RowMapper;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.Map;
 public class FileStorageParser {
     @SuppressWarnings("unchecked")
     public static <K, V> void parseFile(Path path, Map<K, V> map, RowMapper<V> mapper) {
+        log.debug("Parsing file: {}", path.toString());
         try {
             for (String line : Files.readAllLines(path)) {
                 var row = line.split(";");
@@ -22,10 +24,9 @@ public class FileStorageParser {
                 } catch (Exception e) {
                     log.error("Error while parsing file line: {}\nSkipping..", line, e);
                 }
-
             }
-        } catch (Exception e) {
-            log.error("Error while parsing file {}", path.getFileName(), e);
+        } catch (IOException e) {
+            log.error("Error while trying read file {}", path.getFileName(), e);
         }
     }
 

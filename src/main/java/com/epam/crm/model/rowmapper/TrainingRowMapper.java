@@ -1,10 +1,12 @@
 package com.epam.crm.model.rowmapper;
 
 import com.epam.crm.model.Training;
+import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.LocalDate;
 
+@Component
 public class TrainingRowMapper implements RowMapper<Training> {
     @Override
     public Training mapRow(String... row) throws RuntimeException {
