@@ -1,4 +1,4 @@
-package com;
+package com.epam.crm;
 
 import com.epam.crm.config.ApplicationConfig;
 import lombok.extern.slf4j.Slf4j;

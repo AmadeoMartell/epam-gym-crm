@@ -1,6 +1,7 @@
 package com.epam.crm.model;
 
 import lombok.Data;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Data
@@ -12,4 +13,9 @@ public class User {
     private String username;
     private String password;
     private Boolean active;
+
+    @ToString.Include(name = "password")
+    private String maskPassword() {
+        return "****";
+    }
 }
