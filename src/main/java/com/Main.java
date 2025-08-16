@@ -1,7 +1,6 @@
 package com;
 
 import com.epam.crm.config.ApplicationConfig;
-import com.epam.crm.model.Trainee;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
