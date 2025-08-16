@@ -1,6 +1,7 @@
 package com.epam.crm.dao;
 
 import com.epam.crm.model.Trainer;
+import com.epam.crm.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,14 +17,18 @@ import java.util.Optional;
 public class TrainerDao {
     @Qualifier("trainers")
     private final Map<Long, Trainer> storage;
+    @Qualifier("users")
+    private final Map<String, User> users;
 
     @Autowired
-    public TrainerDao(Map<Long, Trainer> storage) {
+    public TrainerDao(Map<Long, Trainer> storage, Map<String, User> users) {
         this.storage = storage;
+        this.users = users;
     }
 
     public Trainer create(Trainer t) {
         storage.put(t.getId(), t);
+        users.put(t.getUsername(), t);
         log.info("Trainer created: {}", t);
         return t;
     }
@@ -38,6 +43,7 @@ public class TrainerDao {
 
     public Trainer update(Trainer t) {
         storage.put(t.getId(), t);
+        users.put(t.getUsername(), t);
         log.info("Trainer updated: {}", t);
         return t;
     }
