@@ -40,7 +40,7 @@ public class User {
 
     @NotNull
     @Column(name = "is_active", nullable = false)
-    private Boolean active;
+    private Boolean isActive;
 
     @ToString.Include(name = "password")
     private String maskPassword() {
