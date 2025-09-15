@@ -1,76 +1,66 @@
 package com.epam.crm.service;
 
-import com.epam.crm.dao.TrainingDao;
-import com.epam.crm.model.Training;
+import com.epam.crm.model.*;
+import com.epam.crm.repository.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.*;
 
-import java.time.Duration;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class TrainingServiceTest {
 
     @Mock
-    TrainingDao trainingDao;
+    TrainingRepository trainingRepository;
+    @Mock
+    TraineeRepository traineeRepository;
+    @Mock
+    TrainerRepository trainerRepository;
+    @Mock
+    TrainingTypeRepository trainingTypeRepository;
 
     @InjectMocks
-    TrainingService trainingService;
+    TrainingService service;
 
-    private Training training(long id, long traineeId, long trainerId, long typeId, String name) {
-        return Training.builder()
-                .id(id)
-                .traineeId(traineeId)
-                .trainerId(trainerId)
-                .trainingTypeId(typeId)
-                .name(name)
-                .date(LocalDate.of(2025, 1, 1))
-                .duration(Duration.ofMinutes(60))
-                .build();
+    @BeforeEach
+    void setup() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void create_delegatesToDao() {
-        Training t = training(1L, 10L, 100L, 7L, "Cardio");
-        when(trainingDao.create(t)).thenReturn(t);
+    void addTraining_validatesAndSaves() {
+        Trainee trainee = new Trainee();
+        trainee.setUsername("trainee1");
+        Trainer trainer = new Trainer();
+        trainer.setUsername("trainer1");
+        TrainingType type = new TrainingType();
+        type.setId(1L);
+        type.setName("Cardio");
 
-        Training res = trainingService.create(t);
+        when(traineeRepository.findByUsername("trainee1")).thenReturn(Optional.of(trainee));
+        when(trainerRepository.findByUsername("trainer1")).thenReturn(Optional.of(trainer));
+        when(trainingTypeRepository.findByName("Cardio")).thenReturn(Optional.of(type));
+        when(trainingRepository.save(any(Training.class))).thenAnswer(inv -> {
+            Training t = inv.getArgument(0);
+            t.setId(777L);
+            return t;
+        });
 
-        assertThat(res).isSameAs(t);
-        verify(trainingDao).create(t);
+        var saved = service.addTraining("trainee1", "trainer1", "Cardio",
+                "Morning Run", LocalDate.now(), 45);
+
+        assertThat(saved.getId()).isEqualTo(777L);
+        assertThat(saved.getTrainingType().getName()).isEqualTo("Cardio");
     }
 
     @Test
-    void get_delegatesToDao() {
-        Training t = training(2L, 11L, 101L, 8L, "Strength");
-        when(trainingDao.findById(2L)).thenReturn(Optional.of(t));
-
-        Optional<Training> res = trainingService.get(2L);
-
-        assertThat(res).contains(t);
-        verify(trainingDao).findById(2L);
-    }
-
-    @Test
-    void list_delegatesToDao() {
-        List<Training> list = List.of(
-                training(1L, 10L, 100L, 7L, "Cardio"),
-                training(2L, 11L, 101L, 8L, "Strength")
-        );
-        when(trainingDao.findAll()).thenReturn(list);
-
-        List<Training> res = trainingService.list();
-
-        assertThat(res).isEqualTo(list);
-        verify(trainingDao).findAll();
+    void addTraining_rejectsNonPositiveDuration() {
+        assertThatThrownBy(() -> service.addTraining("t", "r", "x", "n", LocalDate.now(), 0))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
+

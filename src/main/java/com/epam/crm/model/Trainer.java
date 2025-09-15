@@ -1,14 +1,39 @@
 package com.epam.crm.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "trainers")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @SuperBuilder(toBuilder = true)
-@ToString(callSuper = true)
 public class Trainer extends User {
-    private Long specializationId;
+
+    @Column(name = "specialization", length = 100)
+    private String specialization;
+
+    @ManyToMany(mappedBy = "trainers", fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<Trainee> trainees = new HashSet<>();
+
+    @OneToMany(mappedBy = "trainer", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @Builder.Default
+    private Set<Training> trainings = new HashSet<>();
+
+    public void addTrainee(Trainee t) {
+        trainees.add(t);
+        t.getTrainers().add(this);
+    }
+
+    public void removeTrainee(Trainee t) {
+        trainees.remove(t);
+        t.getTrainers().remove(this);
+    }
 }
