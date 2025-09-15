@@ -1,5 +1,4 @@
-package com.epam.crm.api.registration;
-
+package com.epam.crm.api.dto.registration;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -16,7 +15,6 @@ public class TraineeRegistrationRequest {
     @NotBlank
     @ApiModelProperty(value = "First name", required = true, example = "John")
     private String firstName;
-
 
     @NotBlank
     @ApiModelProperty(value = "Last name", required = true, example = "Smith")

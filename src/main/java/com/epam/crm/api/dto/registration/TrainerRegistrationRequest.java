@@ -1,4 +1,4 @@
-package com.epam.crm.api.registration;
+package com.epam.crm.api.dto.registration;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -20,6 +20,6 @@ public class TrainerRegistrationRequest {
 
 
     @NotNull
-    @ApiModelProperty(value = "Training type ID (specialization)", required = true, example = "1")
-    private Long specializationId;
+    @ApiModelProperty(value = "Trainer specialization)", required = true, example = "Yoga")
+    private String specialization;
 }

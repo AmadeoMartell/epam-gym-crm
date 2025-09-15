@@ -1,4 +1,4 @@
-package com.epam.crm.api.registration;
+package com.epam.crm.api.dto.registration;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
