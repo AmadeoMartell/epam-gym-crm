@@ -3,6 +3,7 @@ package com.epam.crm.api;
 import com.epam.crm.api.dto.trainee.TraineeProfileResponse;
 import com.epam.crm.api.dto.trainee.TrainerShortDto;
 import com.epam.crm.api.dto.trainee.UpdateTraineeRequest;
+import com.epam.crm.api.dto.trainee.UpdateTraineeTrainersRequest;
 import com.epam.crm.model.Trainee;
 import com.epam.crm.model.Trainer;
 import com.epam.crm.service.AuthService;
@@ -101,5 +102,42 @@ public class TraineeController {
                 trainer.getLastName(),
                 trainer.getSpecialization()
         );
+    }
+
+    @GetMapping("/unassigned-trainers")
+    public ResponseEntity<java.util.List<TrainerShortDto>> getUnassignedActiveTrainers(
+            @RequestHeader("X-Username") String authUsername,
+            @RequestHeader("X-Password") String authPassword,
+            @RequestParam String username
+    ) {
+        authService.authenticate(authUsername, authPassword);
+
+        var trainers = traineeService.getUnassignedTrainersForTrainee(username)
+                .stream()
+                .filter(tr -> Boolean.TRUE.equals(tr.getIsActive())) // только активные
+                .map(this::toTrainerShort)
+                .collect(java.util.stream.Collectors.toList());
+
+        return ResponseEntity.ok(trainers);
+    }
+
+    @PutMapping("/trainers")
+    public ResponseEntity<java.util.List<TrainerShortDto>> updateTraineeTrainers(
+            @RequestHeader("X-Username") String authUsername,
+            @RequestHeader("X-Password") String authPassword,
+            @Valid @RequestBody UpdateTraineeTrainersRequest req
+    ) {
+        authService.authenticate(authUsername, authPassword);
+
+        traineeService.updateTraineeTrainers(req.getTraineeUsername(), req.getTrainers());
+
+        var trainee = traineeService.findByUsername(req.getTraineeUsername())
+                .orElseThrow(() -> new java.util.NoSuchElementException("Trainee not found: " + req.getTraineeUsername()));
+
+        var resp = (trainee.getTrainers() == null ? java.util.List.<TrainerShortDto>of()
+                : trainee.getTrainers().stream().map(this::toTrainerShort)
+                .collect(java.util.stream.Collectors.toList()));
+
+        return ResponseEntity.ok(resp);
     }
 }
