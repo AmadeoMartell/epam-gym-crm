@@ -1,5 +1,6 @@
 package com.epam.crm.api;
 
+import com.epam.crm.api.dto.common.ActivationRequest;
 import com.epam.crm.api.dto.trainer.TraineeShortDto;
 import com.epam.crm.api.dto.trainer.TrainerProfileResponse;
 import com.epam.crm.api.dto.trainer.UpdateTrainerRequest;
@@ -63,6 +64,22 @@ public class TrainerController {
 
         return ResponseEntity.ok(toResponse(updated));
     }
+
+    @PatchMapping("/activation")
+    public ResponseEntity<Void> toggleTrainer(
+            @RequestHeader("X-Username") String authUsername,
+            @RequestHeader("X-Password") String authPassword,
+            @RequestBody @Valid ActivationRequest req
+    ) {
+        authService.authenticate(authUsername, authPassword);
+        if (Boolean.TRUE.equals(req.getIsActive())) {
+            trainerService.activate(req.getUsername());
+        } else {
+            trainerService.deactivate(req.getUsername());
+        }
+        return ResponseEntity.ok().build();
+    }
+
 
     private TrainerProfileResponse toResponse(Trainer trainer) {
         TrainerProfileResponse trainerProfileResponse = new TrainerProfileResponse();

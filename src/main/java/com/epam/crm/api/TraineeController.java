@@ -1,5 +1,6 @@
 package com.epam.crm.api;
 
+import com.epam.crm.api.dto.common.ActivationRequest;
 import com.epam.crm.api.dto.trainee.TraineeProfileResponse;
 import com.epam.crm.api.dto.trainee.TrainerShortDto;
 import com.epam.crm.api.dto.trainee.UpdateTraineeRequest;
@@ -114,7 +115,7 @@ public class TraineeController {
 
         var trainers = traineeService.getUnassignedTrainersForTrainee(username)
                 .stream()
-                .filter(tr -> Boolean.TRUE.equals(tr.getIsActive())) // только активные
+                .filter(tr -> Boolean.TRUE.equals(tr.getIsActive()))
                 .map(this::toTrainerShort)
                 .collect(java.util.stream.Collectors.toList());
 
@@ -140,4 +141,20 @@ public class TraineeController {
 
         return ResponseEntity.ok(resp);
     }
+
+    @PatchMapping("/activation")
+    public ResponseEntity<Void> toggleTrainee(
+            @RequestHeader("X-Username") String authUsername,
+            @RequestHeader("X-Password") String authPassword,
+            @RequestBody @Valid ActivationRequest req
+    ) {
+        authService.authenticate(authUsername, authPassword);
+        if (Boolean.TRUE.equals(req.getIsActive())) {
+            traineeService.activate(req.getUsername());
+        } else {
+            traineeService.deactivate(req.getUsername());
+        }
+        return ResponseEntity.ok().build();
+    }
+
 }
