@@ -25,7 +25,7 @@ public class Trainee extends User {
     @Column(name = "address", length = 255)
     private String address;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "trainee_trainer",
             joinColumns = @JoinColumn(name = "trainee_id"),
@@ -37,7 +37,7 @@ public class Trainee extends User {
 
     @OneToMany(
             mappedBy = "trainee",
-            fetch = FetchType.LAZY,
+            fetch = FetchType.EAGER,
             cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
             orphanRemoval = true
     )

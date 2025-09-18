@@ -34,7 +34,7 @@ public class TrainerController {
     public ResponseEntity<TrainerProfileResponse> getProfile(
             @RequestHeader("X-Username") String authUsername,
             @RequestHeader("X-Password") String authPassword,
-            @RequestParam String username
+            @RequestParam("username") String username
     ) {
         authService.authenticate(authUsername, authPassword);
         Trainer trainer = trainerService.findByUsernameOrThrow(username);

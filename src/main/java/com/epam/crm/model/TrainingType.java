@@ -24,7 +24,7 @@ public class TrainingType {
     @Column(name = "name", nullable = false, length = 100, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "trainingType", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "trainingType", fetch = FetchType.EAGER)
     @Builder.Default
     private Set<Training> trainings = new HashSet<>();
 }

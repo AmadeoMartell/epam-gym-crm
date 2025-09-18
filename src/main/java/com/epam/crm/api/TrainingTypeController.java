@@ -1,7 +1,6 @@
 package com.epam.crm.api;
 
 import com.epam.crm.api.dto.training.TrainingTypeDto;
-import com.epam.crm.model.TrainingType;
 import com.epam.crm.repository.TrainingTypeRepository;
 import com.epam.crm.service.AuthService;
 import lombok.RequiredArgsConstructor;

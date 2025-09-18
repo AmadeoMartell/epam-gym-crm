@@ -36,11 +36,11 @@ public class TrainingController {
     public ResponseEntity<List<TraineeTrainingItemDto>> getTraineeTrainings(
             @RequestHeader("X-Username") String authUsername,
             @RequestHeader("X-Password") String authPassword,
-            @RequestParam String username,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodFrom,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodTo,
-            @RequestParam(required = false) String trainerName,
-            @RequestParam(required = false) String trainingType
+            @RequestParam("username") String username,
+            @RequestParam(value = "periodFrom", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodFrom,
+            @RequestParam(value = "periodTo",   required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodTo,
+            @RequestParam(value = "trainerName", required = false) String trainerName,
+            @RequestParam(value = "trainingType", required = false) String trainingType
     ) {
         authService.authenticate(authUsername, authPassword);
 

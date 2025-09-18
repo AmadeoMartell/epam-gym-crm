@@ -2,6 +2,7 @@ package com.epam.crm.api.dto.training;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -15,7 +16,11 @@ public class AddTrainingRequest {
     @NotBlank private String trainerUsername;
     @NotBlank private String trainingTypeName;
     @NotBlank private String trainingName;
-    @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+
+    @NotNull @Positive(message = "trainingDuration must be positive")
+    private Integer trainingDuration;
+
+    @NotNull
     private LocalDate trainingDate;
-    @NotNull private Integer trainingDuration;
 }
+

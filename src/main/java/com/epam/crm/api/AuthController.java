@@ -24,8 +24,8 @@ public class AuthController {
     })
     @GetMapping("/login")
     public ResponseEntity<Void> login(
-            @RequestParam String username,
-            @RequestParam String password
+            @RequestParam("username") String username,
+            @RequestParam("password") String password
     ) {
         authService.authenticate(username, password);
         return ResponseEntity.ok().build();

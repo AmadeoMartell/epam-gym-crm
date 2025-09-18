@@ -22,13 +22,13 @@ public class Training {
     private Long id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "trainee_id", nullable = false,
             foreignKey = @ForeignKey(name = "fk_training_trainee"))
     private Trainee trainee;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "trainer_id", nullable = false,
             foreignKey = @ForeignKey(name = "fk_training_trainer"))
     private Trainer trainer;
@@ -38,7 +38,7 @@ public class Training {
     private String name;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "training_type_id", nullable = false,
             foreignKey = @ForeignKey(name = "fk_training_type"))
     private TrainingType trainingType;

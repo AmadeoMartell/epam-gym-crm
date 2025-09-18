@@ -19,11 +19,11 @@ public class Trainer extends User {
     @Column(name = "specialization", length = 100)
     private String specialization;
 
-    @ManyToMany(mappedBy = "trainers", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "trainers", fetch = FetchType.EAGER)
     @Builder.Default
     private Set<Trainee> trainees = new HashSet<>();
 
-    @OneToMany(mappedBy = "trainer", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "trainer", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @Builder.Default
     private Set<Training> trainings = new HashSet<>();
 

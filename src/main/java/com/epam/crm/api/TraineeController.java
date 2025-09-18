@@ -35,7 +35,7 @@ public class TraineeController {
     public ResponseEntity<TraineeProfileResponse> getProfile(
             @RequestHeader("X-Username") String authUsername,
             @RequestHeader("X-Password") String authPassword,
-            @RequestParam String username
+            @RequestParam("username") String username
     ) {
         authService.authenticate(authUsername, authPassword);
 
@@ -93,7 +93,7 @@ public class TraineeController {
     public ResponseEntity<Void> deleteProfile(
             @RequestHeader("X-Username") String authUsername,
             @RequestHeader("X-Password") String authPassword,
-            @RequestParam String username
+            @RequestParam("username") String username
     ) {
         authService.authenticate(authUsername, authPassword);
         traineeService.deleteByUsername(username);
@@ -135,7 +135,7 @@ public class TraineeController {
     public ResponseEntity<java.util.List<TrainerShortDto>> getUnassignedActiveTrainers(
             @RequestHeader("X-Username") String authUsername,
             @RequestHeader("X-Password") String authPassword,
-            @RequestParam String username
+            @RequestParam("username") String username
     ) {
         authService.authenticate(authUsername, authPassword);
 

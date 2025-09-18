@@ -57,4 +57,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> other(Exception ex, HttpServletRequest req) {
         return build(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), req);
     }
+
+
 }
