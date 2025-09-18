@@ -64,6 +64,7 @@ public class TraineeService {
         return new CreatedAccount(saved.getId(), username, rawPassword);
     }
 
+    @Transactional
     public Optional<Trainee> findByUsername(String username) {
         return traineeRepository.findByUsername(username);
     }

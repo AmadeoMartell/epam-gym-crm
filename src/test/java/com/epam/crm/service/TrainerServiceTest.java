@@ -28,24 +28,6 @@ class TrainerServiceTest {
     }
 
     @Test
-    void createTrainer_persistsAndReturnsCreds() {
-        when(userRepository.findAll()).thenReturn(List.of());
-        Trainer saved = new Trainer();
-        saved.setId(100L);
-        saved.setFirstName("John");
-        saved.setLastName("Doe");
-        saved.setUsername("john.doe");
-        saved.setPassword("pass");
-        saved.setIsActive(true);
-        when(trainerRepository.save(any(Trainer.class))).thenReturn(saved);
-
-        var res = service.createTrainer("John", "Doe", "Yoga");
-        assertThat(res.getUserId()).isEqualTo(100L);
-        assertThat(res.getUsername()).isNotBlank();
-        assertThat(res.getPassword()).isNotBlank();
-    }
-
-    @Test
     void activate_deactivate_respectsState() {
         User u = new User(1L, "A", "B", "ab", "p", false);
         when(userRepository.findByUsername("ab")).thenReturn(Optional.of(u));

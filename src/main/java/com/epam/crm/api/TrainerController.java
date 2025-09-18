@@ -12,10 +12,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.annotations.*;
 import java.util.stream.Collectors;
 
-@Api(tags = "Trainer")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/trainers")
@@ -24,12 +22,6 @@ public class TrainerController {
     private final TrainerService trainerService;
     private final AuthService authService;
 
-    @ApiOperation("Get trainer profile")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 404, message = "Trainer not found")
-    })
     @GetMapping("/profile")
     public ResponseEntity<TrainerProfileResponse> getProfile(
             @RequestHeader("X-Username") String authUsername,
@@ -41,13 +33,6 @@ public class TrainerController {
         return ResponseEntity.ok(toResponse(trainer));
     }
 
-    @ApiOperation("Update trainer profile (specialization is read-only)")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Validation error"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 404, message = "Trainer not found")
-    })
     @PutMapping("/profile")
     public ResponseEntity<TrainerProfileResponse> updateProfile(
             @RequestHeader("X-Username") String authUsername,
@@ -79,14 +64,6 @@ public class TrainerController {
         return ResponseEntity.ok(toResponse(updated));
     }
 
-    @ApiOperation("Activate/Deactivate trainer (non-idempotent)")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Validation error"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 404, message = "Trainer not found"),
-            @ApiResponse(code = 409, message = "Already in requested state")
-    })
     @PatchMapping("/activation")
     public ResponseEntity<Void> toggleTrainer(
             @RequestHeader("X-Username") String authUsername,

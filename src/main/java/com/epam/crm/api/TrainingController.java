@@ -12,12 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.annotations.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-@Api(tags = "Training")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -26,12 +24,6 @@ public class TrainingController {
     private final TrainingService trainingService;
     private final AuthService authService;
 
-    @ApiOperation("Get trainee trainings list with filters")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 404, message = "Trainee not found (if service enforces)")
-    })
     @GetMapping("/trainees/trainings")
     public ResponseEntity<List<TraineeTrainingItemDto>> getTraineeTrainings(
             @RequestHeader("X-Username") String authUsername,
@@ -51,12 +43,6 @@ public class TrainingController {
         return ResponseEntity.ok(items.stream().map(this::toDto).toList());
     }
 
-    @ApiOperation("Get trainer trainings list with filters")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 404, message = "Trainer not found (if service enforces)")
-    })
     @GetMapping("/trainers/trainings")
     public ResponseEntity<java.util.List<TrainerTrainingItemDto>> getTrainerTrainings(
             @RequestHeader("X-Username") String authUsername,
@@ -111,13 +97,6 @@ public class TrainingController {
         return s == null ? "" : s;
     }
 
-    @ApiOperation("Add training")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Validation error"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 404, message = "Trainee/Trainer/TrainingType not found")
-    })
     @PostMapping("/trainings")
     public  ResponseEntity<Void> addTraining(
             @RequestHeader("X-Username") String authUsername,
