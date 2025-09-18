@@ -5,11 +5,11 @@ import com.epam.crm.model.Trainer;
 import com.epam.crm.model.User;
 import com.epam.crm.repository.TraineeRepository;
 import com.epam.crm.repository.TrainerRepository;
+import com.epam.crm.repository.TrainingRepository;
 import com.epam.crm.repository.UserRepository;
 import com.epam.crm.util.PasswordGenerator;
 import com.epam.crm.util.UniqueUsernameGenerator;
 import jakarta.transaction.Transactional;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +27,7 @@ public class TraineeService {
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
     private final UserRepository userRepository;
+    private final TrainingRepository trainingRepository;
 
     @Value
     public static class CreatedAccount {
@@ -37,6 +38,13 @@ public class TraineeService {
 
     @Transactional
     public CreatedAccount createTrainee(String firstName, String lastName, LocalDate dateOfBirth, String address) {
+        boolean existsAsTrainer = trainerRepository.findAll().stream()
+                .anyMatch(tr -> tr.getFirstName().equalsIgnoreCase(firstName)
+                        && tr.getLastName().equalsIgnoreCase(lastName));
+        if (existsAsTrainer) {
+            throw new IllegalStateException("Person is already registered as Trainer");
+        }
+
         Set<String> taken = userRepository.findAll().stream().map(User::getUsername).collect(Collectors.toSet());
         String username = UniqueUsernameGenerator.generate(taken, firstName, lastName);
 
@@ -113,9 +121,13 @@ public class TraineeService {
 
     @Transactional
     public void deleteByUsername(String username) {
-        Trainee t = traineeRepository.findByUsername(username).orElseThrow(() -> new NoSuchElementException("Trainee not found: " + username));
+        trainingRepository.deleteByTraineeUsername(username);
+
+        Trainee t = traineeRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("Trainee not found: " + username));
+
         traineeRepository.delete(t);
-        log.info("Trainee deleted: {}", username);
+        log.info("Trainee deleted: {} (trainings cascade deleted)", username);
     }
 
     @Transactional

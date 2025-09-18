@@ -2,6 +2,7 @@ package com.epam.crm.service;
 
 import com.epam.crm.model.Trainer;
 import com.epam.crm.model.User;
+import com.epam.crm.repository.TraineeRepository;
 import com.epam.crm.repository.TrainerRepository;
 import com.epam.crm.repository.UserRepository;
 import com.epam.crm.util.PasswordGenerator;
@@ -24,6 +25,7 @@ public class TrainerService {
 
     private final TrainerRepository trainerRepository;
     private final UserRepository userRepository;
+    private final TraineeRepository traineeRepository;
 
     @Value
     public static class CreatedAccount {
@@ -34,6 +36,13 @@ public class TrainerService {
 
     @Transactional
     public CreatedAccount createTrainer(String firstName, String lastName, String specialization) {
+        boolean existsAsTrainee = traineeRepository.findAll().stream()
+                .anyMatch(t -> t.getFirstName().equalsIgnoreCase(firstName)
+                        && t.getLastName().equalsIgnoreCase(lastName));
+        if (existsAsTrainee) {
+            throw new IllegalStateException("Person is already registered as Trainee");
+        }
+
         Set<String> taken = userRepository.findAll().stream().map(User::getUsername).collect(Collectors.toSet());
         String username = UniqueUsernameGenerator.generate(taken, firstName, lastName);
         String rawPassword = PasswordGenerator.generate(10);
