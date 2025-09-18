@@ -13,9 +13,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import io.swagger.annotations.*;
 import java.util.stream.Collectors;
 
+@Api(tags = "Trainee")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/trainees")
@@ -24,6 +25,12 @@ public class TraineeController {
     private final TraineeService traineeService;
     private final AuthService authService;
 
+    @ApiOperation("Get trainee profile")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Trainee not found")
+    })
     @GetMapping("/profile")
     public ResponseEntity<TraineeProfileResponse> getProfile(
             @RequestHeader("X-Username") String authUsername,
@@ -38,6 +45,13 @@ public class TraineeController {
         return ResponseEntity.ok(toResponse(t));
     }
 
+    @ApiOperation("Update trainee profile (isActive supported)")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Validation error"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Trainee not found")
+    })
     @PutMapping("/profile")
     public ResponseEntity<TraineeProfileResponse> updateProfile(
             @RequestHeader("X-Username") String authUsername,
@@ -69,6 +83,12 @@ public class TraineeController {
         return ResponseEntity.ok(toResponse(updated));
     }
 
+    @ApiOperation("Delete trainee profile (cascade delete trainings)")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Trainee not found")
+    })
     @DeleteMapping("/profile")
     public ResponseEntity<Void> deleteProfile(
             @RequestHeader("X-Username") String authUsername,
@@ -105,6 +125,12 @@ public class TraineeController {
         );
     }
 
+    @ApiOperation("Get active trainers not assigned to the trainee")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Trainee not found")
+    })
     @GetMapping("/unassigned-trainers")
     public ResponseEntity<java.util.List<TrainerShortDto>> getUnassignedActiveTrainers(
             @RequestHeader("X-Username") String authUsername,
@@ -122,6 +148,13 @@ public class TraineeController {
         return ResponseEntity.ok(trainers);
     }
 
+    @ApiOperation("Update trainee's trainer list")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Validation error"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Trainee/Trainer not found")
+    })
     @PutMapping("/trainers")
     public ResponseEntity<java.util.List<TrainerShortDto>> updateTraineeTrainers(
             @RequestHeader("X-Username") String authUsername,
@@ -142,6 +175,14 @@ public class TraineeController {
         return ResponseEntity.ok(resp);
     }
 
+    @ApiOperation("Activate/Deactivate trainee (non-idempotent)")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Validation error"),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Trainee not found"),
+            @ApiResponse(code = 409, message = "Already in requested state")
+    })
     @PatchMapping("/activation")
     public ResponseEntity<Void> toggleTrainee(
             @RequestHeader("X-Username") String authUsername,
