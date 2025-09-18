@@ -1,5 +1,6 @@
 package com.epam.crm.api;
 
+import com.epam.crm.api.dto.training.AddTrainingRequest;
 import com.epam.crm.api.dto.training.TraineeTrainingItemDto;
 import com.epam.crm.api.dto.training.TrainerTrainingItemDto;
 import com.epam.crm.model.Training;
@@ -7,6 +8,7 @@ import com.epam.crm.model.TrainingType;
 import com.epam.crm.model.Trainer;
 import com.epam.crm.service.AuthService;
 import com.epam.crm.service.TrainingService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -62,7 +64,6 @@ public class TrainingController {
                 username, periodFrom, periodTo, traineeName
         );
 
-
         return ResponseEntity.ok(items.stream().map(this::toTrainerDto).toList());
     }
 
@@ -86,11 +87,9 @@ public class TrainingController {
                 .map(TrainingType::getName)
                 .orElse(null);
 
-
         String trainerFullName = Optional.ofNullable(t.getTrainer())
                 .map(tr -> (nullToEmpty(tr.getFirstName()) + " " + nullToEmpty(tr.getLastName())).trim())
                 .orElse(null);
-
 
         return new TraineeTrainingItemDto(
                 t.getName(),
@@ -101,6 +100,26 @@ public class TrainingController {
         );
     }
 
+    private static String nullToEmpty(String s) {
+        return s == null ? "" : s;
+    }
 
-    private static String nullToEmpty(String s) { return s == null ? "" : s; }
+    @PostMapping("/trainings")
+    public  ResponseEntity<Void> addTraining(
+            @RequestHeader("X-Username") String authUsername,
+            @RequestHeader("X-Password") String authPassword,
+            @RequestBody @Valid AddTrainingRequest req
+    ) {
+        authService.authenticate(authUsername, authPassword);
+
+        trainingService.addTraining(
+                req.getTraineeUsername(),
+                req.getTrainerUsername(),
+                req.getTrainingTypeName(),
+                req.getTrainingName(),
+                req.getTrainingDate(),
+                req.getTrainingDuration()
+        );
+        return ResponseEntity.ok().build();
+    }
 }
