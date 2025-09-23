@@ -1,14 +1,9 @@
 package com.epam.crm.config;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManagerFactory;
 import org.flywaydb.core.Flyway;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -23,22 +18,11 @@ import java.util.Properties;
 @ComponentScan("com.epam.crm")
 @EnableTransactionManagement
 @PropertySources(@PropertySource("classpath:/application.properties"))
-@EnableJpaRepositories(basePackages = "com.epam.crm.repository")
 public class ApplicationConfig {
     private final Environment env;
 
     public ApplicationConfig(Environment env) {
         this.env = env;
-    }
-
-    @Bean
-    public DataSource dataSource() {
-        DriverManagerDataSource ds = new DriverManagerDataSource();
-        ds.setDriverClassName(env.getRequiredProperty("db.driver"));
-        ds.setUrl(env.getRequiredProperty("db.url"));
-        ds.setUsername(env.getRequiredProperty("db.username"));
-        ds.setPassword(env.getRequiredProperty("db.password"));
-        return ds;
     }
 
     @Bean(initMethod = "migrate")
