@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
+@PreAuthorize("hasAnyRole('TRAINEE', 'TRAINER')")
 public class TrainingController {
 
     private final TrainingService trainingService;
@@ -26,15 +28,12 @@ public class TrainingController {
 
     @GetMapping("/trainees/trainings")
     public ResponseEntity<List<TraineeTrainingItemDto>> getTraineeTrainings(
-            @RequestHeader("X-Username") String authUsername,
-            @RequestHeader("X-Password") String authPassword,
             @RequestParam("username") String username,
             @RequestParam(value = "periodFrom", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodFrom,
             @RequestParam(value = "periodTo",   required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodTo,
             @RequestParam(value = "trainerName", required = false) String trainerName,
             @RequestParam(value = "trainingType", required = false) String trainingType
     ) {
-        authService.authenticate(authUsername, authPassword);
 
         List<Training> items = trainingService.findForTraineeWithCriteria(
                 username, periodFrom, periodTo, trainerName, trainingType
@@ -45,14 +44,11 @@ public class TrainingController {
 
     @GetMapping("/trainers/trainings")
     public ResponseEntity<java.util.List<TrainerTrainingItemDto>> getTrainerTrainings(
-            @RequestHeader("X-Username") String authUsername,
-            @RequestHeader("X-Password") String authPassword,
             @RequestParam String username,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate periodFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate periodTo,
             @RequestParam(required = false) String traineeName
     ) {
-        authService.authenticate(authUsername, authPassword);
 
         java.util.List<com.epam.crm.model.Training> items = trainingService.findForTrainerWithCriteria(
                 username, periodFrom, periodTo, traineeName
@@ -99,12 +95,8 @@ public class TrainingController {
 
     @PostMapping("/trainings")
     public  ResponseEntity<Void> addTraining(
-            @RequestHeader("X-Username") String authUsername,
-            @RequestHeader("X-Password") String authPassword,
             @RequestBody @Valid AddTrainingRequest req
     ) {
-        authService.authenticate(authUsername, authPassword);
-
         trainingService.addTraining(
                 req.getTraineeUsername(),
                 req.getTrainerUsername(),

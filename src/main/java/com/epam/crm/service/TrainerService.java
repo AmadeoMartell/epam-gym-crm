@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
@@ -26,6 +27,8 @@ public class TrainerService {
     private final TrainerRepository trainerRepository;
     private final UserRepository userRepository;
     private final TraineeRepository traineeRepository;
+    private final PasswordEncoder passwordEncoder;
+
 
     @Value
     public static class CreatedAccount {
@@ -51,7 +54,7 @@ public class TrainerService {
         tr.setFirstName(firstName);
         tr.setLastName(lastName);
         tr.setUsername(username);
-        tr.setPassword(rawPassword);
+        tr.setPassword(passwordEncoder.encode(rawPassword));
         tr.setIsActive(true);
         tr.setSpecialization(specialization);
 

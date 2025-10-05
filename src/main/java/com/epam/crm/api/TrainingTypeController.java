@@ -17,12 +17,7 @@ public class TrainingTypeController {
     private final AuthService authService;
 
     @GetMapping
-    public ResponseEntity<List<TrainingTypeDto>> getAll(
-            @RequestHeader("X-Username") String authUsername,
-            @RequestHeader("X-Password") String authPassword
-    ) {
-        authService.authenticate(authUsername, authPassword);
-
+    public ResponseEntity<List<TrainingTypeDto>> getAll() {
         List<TrainingTypeDto> resp = trainingTypeRepository.findAll()
                 .stream()
                 .map(tt -> new TrainingTypeDto(tt.getId(), tt.getName()))

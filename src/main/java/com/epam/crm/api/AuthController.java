@@ -7,25 +7,31 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthService authService;
 
-    @GetMapping("/login")
-    public ResponseEntity<Void> login(
-            @RequestParam("username") String username,
-            @RequestParam("password") String password
-    ) {
-        authService.authenticate(username, password);
-        return ResponseEntity.ok().build();
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> body) {
+        var username = body.getOrDefault("username", "").trim();
+        var password = body.getOrDefault("password", "");
+        String token = authService.authenticateAndIssueToken(username, password);
+        return ResponseEntity.ok(Map.of("token", token));
     }
 
-    @PutMapping("/login/password")
+    @PutMapping("/password")
     public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest req) {
         authService.changePassword(req.getUsername(), req.getOldPassword(), req.getNewPassword());
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, String>> logout() {
+        return ResponseEntity.ok(Map.of("message", "Logged out"));
     }
 }

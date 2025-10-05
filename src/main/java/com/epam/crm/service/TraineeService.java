@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -28,6 +29,7 @@ public class TraineeService {
     private final TrainerRepository trainerRepository;
     private final UserRepository userRepository;
     private final TrainingRepository trainingRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Value
     public static class CreatedAccount {
@@ -54,7 +56,7 @@ public class TraineeService {
         t.setFirstName(firstName);
         t.setLastName(lastName);
         t.setUsername(username);
-        t.setPassword(rawPassword);
+        t.setPassword(passwordEncoder.encode(rawPassword));
         t.setIsActive(true);
         t.setDateOfBirth(dateOfBirth);
         t.setAddress(address);

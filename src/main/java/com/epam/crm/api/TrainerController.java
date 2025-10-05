@@ -11,12 +11,14 @@ import com.epam.crm.service.TrainerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/trainers")
+@PreAuthorize("hasAnyRole('TRAINER')")
 public class TrainerController {
 
     private final TrainerService trainerService;
@@ -24,23 +26,16 @@ public class TrainerController {
 
     @GetMapping("/profile")
     public ResponseEntity<TrainerProfileResponse> getProfile(
-            @RequestHeader("X-Username") String authUsername,
-            @RequestHeader("X-Password") String authPassword,
             @RequestParam("username") String username
     ) {
-        authService.authenticate(authUsername, authPassword);
         Trainer trainer = trainerService.findByUsernameOrThrow(username);
         return ResponseEntity.ok(toResponse(trainer));
     }
 
     @PutMapping("/profile")
     public ResponseEntity<TrainerProfileResponse> updateProfile(
-            @RequestHeader("X-Username") String authUsername,
-            @RequestHeader("X-Password") String authPassword,
             @Valid @RequestBody UpdateTrainerRequest req
     ) {
-        authService.authenticate(authUsername, authPassword);
-
         Trainer current = trainerService.findByUsernameOrThrow(req.getUsername());
         String specialization = current.getSpecialization();
 
@@ -66,11 +61,8 @@ public class TrainerController {
 
     @PatchMapping("/activation")
     public ResponseEntity<Void> toggleTrainer(
-            @RequestHeader("X-Username") String authUsername,
-            @RequestHeader("X-Password") String authPassword,
             @RequestBody @Valid ActivationRequest req
     ) {
-        authService.authenticate(authUsername, authPassword);
         if (Boolean.TRUE.equals(req.getIsActive())) {
             trainerService.activate(req.getUsername());
         } else {

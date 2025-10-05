@@ -12,12 +12,14 @@ import com.epam.crm.service.TraineeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/trainees")
+@PreAuthorize("hasAnyRole('TRAINEE')")
 public class TraineeController {
 
     private final TraineeService traineeService;
@@ -25,12 +27,8 @@ public class TraineeController {
 
     @GetMapping("/profile")
     public ResponseEntity<TraineeProfileResponse> getProfile(
-            @RequestHeader("X-Username") String authUsername,
-            @RequestHeader("X-Password") String authPassword,
             @RequestParam("username") String username
     ) {
-        authService.authenticate(authUsername, authPassword);
-
         Trainee t = traineeService.findByUsername(username)
                 .orElseThrow(() -> new java.util.NoSuchElementException("Trainee not found: " + username));
 
@@ -39,12 +37,8 @@ public class TraineeController {
 
     @PutMapping("/profile")
     public ResponseEntity<TraineeProfileResponse> updateProfile(
-            @RequestHeader("X-Username") String authUsername,
-            @RequestHeader("X-Password") String authPassword,
             @Valid @RequestBody UpdateTraineeRequest req
     ) {
-        authService.authenticate(authUsername, authPassword);
-
         Trainee updated = traineeService.updateProfile(
                 req.getUsername(),
                 req.getFirstName(),
@@ -70,11 +64,8 @@ public class TraineeController {
 
     @DeleteMapping("/profile")
     public ResponseEntity<Void> deleteProfile(
-            @RequestHeader("X-Username") String authUsername,
-            @RequestHeader("X-Password") String authPassword,
             @RequestParam("username") String username
     ) {
-        authService.authenticate(authUsername, authPassword);
         traineeService.deleteByUsername(username);
         return ResponseEntity.ok().build();
     }
@@ -106,12 +97,8 @@ public class TraineeController {
 
     @GetMapping("/unassigned-trainers")
     public ResponseEntity<java.util.List<TrainerShortDto>> getUnassignedActiveTrainers(
-            @RequestHeader("X-Username") String authUsername,
-            @RequestHeader("X-Password") String authPassword,
             @RequestParam("username") String username
     ) {
-        authService.authenticate(authUsername, authPassword);
-
         var trainers = traineeService.getUnassignedTrainersForTrainee(username)
                 .stream()
                 .filter(tr -> Boolean.TRUE.equals(tr.getIsActive()))
@@ -123,12 +110,8 @@ public class TraineeController {
 
     @PutMapping("/trainers")
     public ResponseEntity<java.util.List<TrainerShortDto>> updateTraineeTrainers(
-            @RequestHeader("X-Username") String authUsername,
-            @RequestHeader("X-Password") String authPassword,
             @Valid @RequestBody UpdateTraineeTrainersRequest req
     ) {
-        authService.authenticate(authUsername, authPassword);
-
         traineeService.updateTraineeTrainers(req.getTraineeUsername(), req.getTrainers());
 
         var trainee = traineeService.findByUsername(req.getTraineeUsername())
@@ -143,11 +126,8 @@ public class TraineeController {
 
     @PatchMapping("/activation")
     public ResponseEntity<Void> toggleTrainee(
-            @RequestHeader("X-Username") String authUsername,
-            @RequestHeader("X-Password") String authPassword,
             @RequestBody @Valid ActivationRequest req
     ) {
-        authService.authenticate(authUsername, authPassword);
         if (Boolean.TRUE.equals(req.getIsActive())) {
             traineeService.activate(req.getUsername());
         } else {
