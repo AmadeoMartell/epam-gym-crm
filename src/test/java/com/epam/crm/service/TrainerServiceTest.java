@@ -1,71 +1,47 @@
 package com.epam.crm.service;
 
-import com.epam.crm.dao.TrainerDao;
 import com.epam.crm.model.Trainer;
+import com.epam.crm.model.User;
+import com.epam.crm.repository.TrainerRepository;
+import com.epam.crm.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class TrainerServiceTest {
 
     @Mock
-    TrainerDao trainerDao;
-
+    TrainerRepository trainerRepository;
+    @Mock
+    UserRepository userRepository;
     @InjectMocks
-    TrainerService trainerService;
+    TrainerService service;
 
-    private Trainer trainer(long id, String uname) {
-        return Trainer.builder()
-                .id(id)
-                .firstName("Alice")
-                .lastName("Smith")
-                .username(uname)
-                .password("pwd")
-                .active(true)
-                .specializationId(101L)
-                .build();
+    @BeforeEach
+    void setup() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void get_delegatesToDao() {
-        Trainer tr = trainer(10L, "alice");
-        when(trainerDao.findById(10L)).thenReturn(Optional.of(tr));
+    void activate_deactivate_respectsState() {
+        User u = new User(1L, "A", "B", "ab", "p", false);
+        when(userRepository.findByUsername("ab")).thenReturn(Optional.of(u));
 
-        Optional<Trainer> res = trainerService.get(10L);
+        service.activate("ab");
+        assertThat(u.getIsActive()).isTrue();
 
-        assertThat(res).contains(tr);
-        verify(trainerDao).findById(10L);
-    }
+        assertThatThrownBy(() -> service.activate("ab"))
+                .isInstanceOf(IllegalStateException.class);
 
-    @Test
-    void list_delegatesToDao() {
-        List<Trainer> list = List.of(trainer(1L, "a"), trainer(2L, "b"));
-        when(trainerDao.findAll()).thenReturn(list);
+        service.deactivate("ab");
+        assertThat(u.getIsActive()).isFalse();
 
-        List<Trainer> res = trainerService.list();
-
-        assertThat(res).isEqualTo(list);
-        verify(trainerDao).findAll();
-    }
-
-    @Test
-    void update_delegatesToDao() {
-        Trainer upd = trainer(3L, "charlie").toBuilder().lastName("Johnson").build();
-        when(trainerDao.update(upd)).thenReturn(upd);
-
-        Trainer res = trainerService.update(upd);
-
-        assertThat(res.getLastName()).isEqualTo("Johnson");
-        verify(trainerDao).update(upd);
+        assertThatThrownBy(() -> service.deactivate("ab"))
+                .isInstanceOf(IllegalStateException.class);
     }
 }

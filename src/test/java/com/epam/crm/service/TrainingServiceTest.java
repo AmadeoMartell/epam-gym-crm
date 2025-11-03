@@ -1,76 +1,68 @@
 package com.epam.crm.service;
 
-import com.epam.crm.dao.TrainingDao;
-import com.epam.crm.model.Training;
+import com.epam.crm.model.*;
+import com.epam.crm.repository.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.Duration;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TrainingServiceTest {
 
-    @Mock
-    TrainingDao trainingDao;
+    @Mock TrainingRepository trainingRepository;
+    @Mock TraineeRepository traineeRepository;
+    @Mock TrainerRepository trainerRepository;
+    @Mock TrainingTypeRepository trainingTypeRepository;
 
-    @InjectMocks
-    TrainingService trainingService;
-
-    private Training training(long id, long traineeId, long trainerId, long typeId, String name) {
-        return Training.builder()
-                .id(id)
-                .traineeId(traineeId)
-                .trainerId(trainerId)
-                .trainingTypeId(typeId)
-                .name(name)
-                .date(LocalDate.of(2025, 1, 1))
-                .duration(Duration.ofMinutes(60))
-                .build();
-    }
+    @InjectMocks TrainingService trainingService;
 
     @Test
-    void create_delegatesToDao() {
-        Training t = training(1L, 10L, 100L, 7L, "Cardio");
-        when(trainingDao.create(t)).thenReturn(t);
+    void addTraining_ok() {
+        Trainee trainee = new Trainee(); trainee.setUsername("trainee1");
+        Trainer trainer = new Trainer(); trainer.setUsername("trainer1");
+        TrainingType type = new TrainingType(); type.setName("Cardio");
 
-        Training res = trainingService.create(t);
+        when(traineeRepository.findByUsername("trainee1")).thenReturn(Optional.of(trainee));
+        when(trainerRepository.findByUsername("trainer1")).thenReturn(Optional.of(trainer));
+        when(trainingTypeRepository.findByName("Cardio")).thenReturn(Optional.of(type));
+        when(trainingRepository.save(any(Training.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        assertThat(res).isSameAs(t);
-        verify(trainingDao).create(t);
-    }
-
-    @Test
-    void get_delegatesToDao() {
-        Training t = training(2L, 11L, 101L, 8L, "Strength");
-        when(trainingDao.findById(2L)).thenReturn(Optional.of(t));
-
-        Optional<Training> res = trainingService.get(2L);
-
-        assertThat(res).contains(t);
-        verify(trainingDao).findById(2L);
-    }
-
-    @Test
-    void list_delegatesToDao() {
-        List<Training> list = List.of(
-                training(1L, 10L, 100L, 7L, "Cardio"),
-                training(2L, 11L, 101L, 8L, "Strength")
+        Training saved = trainingService.addTraining(
+                "trainee1", "trainer1", "Cardio", "Morning Run",
+                LocalDate.of(2024,1,1), 60
         );
-        when(trainingDao.findAll()).thenReturn(list);
 
-        List<Training> res = trainingService.list();
+        assertEquals("Morning Run", saved.getName());
+        assertEquals(60, saved.getDuration());
+        assertEquals(LocalDate.of(2024,1,1), saved.getDate());
+        assertSame(trainee, saved.getTrainee());
+        assertSame(trainer, saved.getTrainer());
+        assertSame(type, saved.getTrainingType());
+    }
 
-        assertThat(res).isEqualTo(list);
-        verify(trainingDao).findAll();
+    @Test
+    void addTraining_zeroDuration_throws() {
+        assertThrows(IllegalArgumentException.class, () ->
+                trainingService.addTraining("t","r","Type","n", LocalDate.now(), 0));
+    }
+
+    @Test
+    void addTraining_nullDate_throws() {
+        assertThrows(IllegalArgumentException.class, () ->
+                trainingService.addTraining("t","r","Type","n", null, 10));
+    }
+
+    @Test
+    void addTraining_missingEntities_throwNotFound() {
+        when(traineeRepository.findByUsername("trainee")).thenReturn(Optional.empty());
+        assertThrows(java.util.NoSuchElementException.class, () ->
+                trainingService.addTraining("trainee","trainer","Type","n", LocalDate.now(), 10));
     }
 }
